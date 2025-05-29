@@ -247,7 +247,7 @@ def dashboard_performance():
     plt.colorbar(scatter8, ax=ax8, label='Margem Lucro (%)')
     
     plt.tight_layout()
-    plt.show()
+    #plt.show()
     
     # Retornar dados para análises posteriores
     return {
@@ -255,8 +255,51 @@ def dashboard_performance():
         'vendas_totais': vendas_totais,
         'margem_lucro': margem_lucro,
         'satisfacao_cliente': satisfacao_cliente,
-        'eficiencia': eficiencia
+        'eficiencia': eficiencia,
+        'fig': fig
     }
 
 # Executar o dashboard
 dashboard_performance()
+
+import json
+import pickle
+import os
+
+# =============================================================================
+# MÉTODO 1: SALVANDO IMAGENS EM DIFERENTES FORMATOS
+# =============================================================================
+
+def salvar_dashboard_imagens(fig, nome_base="dashboard"):
+    """
+    Salva o dashboard em múltiplos formatos de imagem
+    """
+    # Criar diretório se não existir
+    os.makedirs("dashboards_salvos", exist_ok=True)
+    
+    # Timestamp para versionamento
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    # Diferentes formatos e configurações
+    formatos = {
+        'png': {'dpi': 300, 'bbox_inches': 'tight', 'facecolor': 'white'},
+        'pdf': {'dpi': 300, 'bbox_inches': 'tight'},
+        'svg': {'bbox_inches': 'tight'},
+        'jpg': {'dpi': 300, 'bbox_inches': 'tight', 'facecolor': 'white'},
+        'eps': {'dpi': 300, 'bbox_inches': 'tight'}
+    }
+    
+    caminhos_salvos = {}
+    
+    for formato, config in formatos.items():
+        caminho = f"dashboards_salvos/{nome_base}_{timestamp}.{formato}"
+        try:
+            fig.savefig(caminho, **config)
+            caminhos_salvos[formato] = caminho
+            print(f"✓ Dashboard salvo em {formato.upper()}: {caminho}")
+        except Exception as e:
+            print(f"✗ Erro ao salvar em {formato}: {e}")
+    
+    return caminhos_salvos
+
+salvar_dashboard_imagens(dashboard_performance().get('fig'))
