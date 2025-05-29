@@ -8,6 +8,7 @@ import networkx as nx
 from mpl.toolkits.mplot3d import Axes3D
 import seaborn as sns
 from datatime import datetime, timedelta
+import matplotlib.dates as mdates
 
 #Configuração global para estilo corporativo
 plt.style.use('seaborn-v0_8-darkgrid')
@@ -142,3 +143,38 @@ def exemplo_1_dashboard_performance():
     plt.colorbar(im5, ax=ax5, shrink=0.8)
 
     # 6 - Serie Temporal com Tendencias
+    ax6 = plt.subplot(3,3,(6,9)) #ocupar espaço de 2 subplots
+    
+    # gerar serie temporal realista
+    dates = pd.date_range(start='2022-01-01', periods=365, freq='D')
+    
+    # multiplas series com dtendencias diferentes
+    base_demand = 1000 + 200 * np.sin(2 * np.pi * np.arange(365) / 365) # sazonaidade anual
+    weekly_pattern = 50 * np.sin(2*np.pi * np.arange(365) / 7) # padrão semanal
+    trend = np.linspace(0,300,365) # tendência crescente
+    noise = np.random.normal(0, 30, 365) # ruido
+
+    # diferentes categorias de produtos
+    cimento = base_demand + trend + noise + 200
+    aco = base_demand * 0.6 + trend * 1.2 + noise + weekly_pattern + 150
+    madeira = base_demand * 0.6 + trend *0.8 + noise * 1.5 + 100
+
+    ax6.plot(dates, cimento, label='Cimento', linewidth=2, color='#8B4513')
+    ax6.plot(dates, aco, label='Aço', linewidth=2, color='#808080')
+    ax6.plot(dates, madeira, label='Madeira', linewidth=2, color='#000000')
+
+    # adicionar média moveis
+    window = 30
+    ax6.plot(dates[window-1:], np.convolve(cimento, np.ones(window)/window, mode='valid'), '--', alpha=0.7, color='#8B4513', label='Média Movel Cimento')
+    ax6.plot(dates[window-1:], np.convolve(aco, np.ones(window)/window, mode='valid'), '--', alpha=0.7, color='#808080', label='Média Movel Aço')
+    ax6.plot(dates[window-1:], np.convolve(madeira, np.ones(window)/window, mode='valid'), '--', alpha=0.7, color='#000000', label='Média Movel Madeira')
+
+    ax6.set_title('Serie Temporal de Vendas \nPor Categoria de Produtos', fontweight='bold')
+    ax6.set_xlabel('Periodo')
+    ax6.set_ylabel('Demanda (toneladas)')
+    ax6.legend(ncol=2)
+    ax6.grid(True, alpha=0.3)
+
+    # formatacao de datas
+    ax6.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+    ax6.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
