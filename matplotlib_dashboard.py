@@ -83,7 +83,7 @@ def dashboard_performance():
     box_data = [df_box[df_box['Performance'] == cat]['Tempo_Entrega'].values 
                 for cat in ['Baixa', 'Média', 'Alta']]
     
-    bp = ax3.boxplot(box_data, labels=['Baixa', 'Média', 'Alta'], patch_artist=True)
+    bp = ax3.boxplot(box_data, tick_labels=['Baixa', 'Média', 'Alta'], patch_artist=True)
     colors_box = ['#FF6B6B', '#4ECDC4', '#45B7D1']
     for patch, color in zip(bp['boxes'], colors_box):
         patch.set_facecolor(color)
@@ -303,3 +303,177 @@ def salvar_dashboard_imagens(fig, nome_base="dashboard"):
     return caminhos_salvos
 
 salvar_dashboard_imagens(dashboard_performance().get('fig'))
+
+# =============================================================================
+# MÉTODO 2: SALVANDO DADOS EM DIFERENTES FORMATOS
+# =============================================================================
+
+def salvar_dados_dashboard(dados_dict, nome_base="dados_dashboard"):
+    """
+    Salva os dados utilizados no dashboard em múltiplos formatos
+    """
+    # Verificar se dados_dict é válido
+    if dados_dict is None or not isinstance(dados_dict, dict) or len(dados_dict) == 0:
+        print("⚠️ Aviso: Nenhum dado fornecido para salvamento")
+        # Criar dados de exemplo para evitar erro
+        dados_dict = {
+            'exemplo_vazio': [0],
+            'timestamp': datetime.now().strftime("%Y%m%d_%H%M%S")
+        }
+    
+    os.makedirs("dados_salvos", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    caminhos_dados = {}
+    
+    # Limpar e validar dados
+    dados_limpos = {}
+    for nome, dados in dados_dict.items():
+        if dados is not None:
+            dados_limpos[nome] = dados
+        else:
+            dados_limpos[nome] = "N/A"
+    
+    # 1. Excel com múltiplas abas
+    try:
+        caminho_excel = f"dados_salvos/{nome_base}_{timestamp}.xlsx"
+        
+        # Verificar se há dados válidos para Excel
+        dados_para_excel = {}
+        for nome, dados in dados_limpos.items():
+            try:
+                if isinstance(dados, (list, np.ndarray)) and len(dados) > 0:
+                    df_temp = pd.DataFrame({nome: dados})
+                elif isinstance(dados, dict) and len(dados) > 0:
+                    df_temp = pd.DataFrame(dados)
+                else:
+                    # Para valores únicos ou strings
+                    df_temp = pd.DataFrame({nome: [dados]})
+                
+                # Verificar se DataFrame não está vazio
+                if not df_temp.empty:
+                    dados_para_excel[nome] = df_temp
+            except Exception as e_inner:
+                print(f"⚠️ Aviso: Erro ao processar '{nome}' para Excel: {e_inner}")
+                # Criar DataFrame com valor de fallback
+                dados_para_excel[nome] = pd.DataFrame({nome: [str(dados)]})
+        
+        # Salvar apenas se houver dados válidos
+        if dados_para_excel:
+            with pd.ExcelWriter(caminho_excel, engine='openpyxl') as writer:
+                for nome, df in dados_para_excel.items():
+                    # Nome da aba (limitado a 31 caracteres e caracteres válidos)
+                    nome_aba = "".join(c for c in nome if c.isalnum() or c in (' ', '_', '-'))[:31]
+                    if not nome_aba:  # Se nome ficou vazio após limpeza
+                        nome_aba = f"Dados_{len(dados_para_excel)}"
+                    
+                    df.to_excel(writer, sheet_name=nome_aba, index=False)
+            
+            caminhos_dados['excel'] = caminho_excel
+            print(f"✓ Dados salvos em Excel: {caminho_excel}")
+        else:
+            print("⚠️ Aviso: Nenhum dado válido encontrado para Excel")
+            
+    except Exception as e:
+        print(f"✗ Erro ao salvar Excel: {e}")
+    
+    # 2. CSV consolidado
+    try:
+        caminho_csv = f"dados_salvos/{nome_base}_{timestamp}.csv"
+        
+        # Preparar dados para CSV
+        dados_csv = {}
+        max_len = 1  # Pelo menos 1 linha
+        
+        # Primeiro passo: determinar tamanho máximo
+        for nome, dados in dados_limpos.items():
+            if isinstance(dados, (list, np.ndarray)) and len(dados) > 0:
+                max_len = max(max_len, len(dados))
+        
+        # Segundo passo: padronizar todos os dados
+        for nome, dados in dados_limpos.items():
+            if isinstance(dados, (list, np.ndarray)) and len(dados) > 0:
+                # Converter para lista e preencher
+                dados_lista = list(dados)
+                dados_lista.extend([np.nan] * (max_len - len(dados_lista)))
+                dados_csv[nome] = dados_lista
+            else:
+                # Para valores únicos
+                valores = [dados] + [np.nan] * (max_len - 1)
+                dados_csv[nome] = valores
+        
+        # Criar DataFrame e salvar
+        if dados_csv:
+            df_consolidado = pd.DataFrame(dados_csv)
+            df_consolidado.to_csv(caminho_csv, index=False, encoding='utf-8')
+            caminhos_dados['csv'] = caminho_csv
+            print(f"✓ Dados salvos em CSV: {caminho_csv}")
+        else:
+            print("⚠️ Aviso: Nenhum dado válido encontrado para CSV")
+            
+    except Exception as e:
+        print(f"✗ Erro ao salvar CSV: {e}")
+    
+    # 3. JSON estruturado
+    try:
+        caminho_json = f"dados_salvos/{nome_base}_{timestamp}.json"
+        
+        # Converter dados para JSON seguro
+        dados_json = {}
+        for nome, dados in dados_limpos.items():
+            try:
+                if isinstance(dados, np.ndarray):
+                    dados_json[nome] = dados.tolist()
+                elif isinstance(dados, (list, dict, str, int, float, bool)):
+                    dados_json[nome] = dados
+                elif dados is None:
+                    dados_json[nome] = None
+                else:
+                    dados_json[nome] = str(dados)
+            except Exception as e_inner:
+                print(f"⚠️ Aviso: Erro ao converter '{nome}' para JSON: {e_inner}")
+                dados_json[nome] = str(dados)
+        
+        # Adicionar metadados
+        dados_json['_metadata'] = {
+            'timestamp': timestamp,
+            'total_variaveis': len(dados_limpos),
+            'variaveis': list(dados_limpos.keys()),
+            'data_criacao': datetime.now().isoformat()
+        }
+        
+        with open(caminho_json, 'w', encoding='utf-8') as f:
+            json.dump(dados_json, f, indent=2, ensure_ascii=False, default=str)
+        
+        caminhos_dados['json'] = caminho_json
+        print(f"✓ Dados salvos em JSON: {caminho_json}")
+        
+    except Exception as e:
+        print(f"✗ Erro ao salvar JSON: {e}")
+    
+    # 4. Pickle para preservar objetos Python nativos
+    try:
+        caminho_pickle = f"dados_salvos/{nome_base}_{timestamp}.pkl"
+        with open(caminho_pickle, 'wb') as f:
+            pickle.dump(dados_limpos, f)
+        
+        caminhos_dados['pickle'] = caminho_pickle
+        print(f"✓ Dados salvos em Pickle: {caminho_pickle}")
+    except Exception as e:
+        print(f"✗ Erro ao salvar Pickle: {e}")
+    
+    return caminhos_dados
+
+# Obter os dados diretamente do dashboard_performance
+dados = dashboard_performance()
+
+# Verificar o conteúdo de dados
+print("Conteúdo de dados_dict:", dados)
+
+# Salvar os dados
+salvar_dados_dashboard(dados)
+
+
+               
+                
+    
