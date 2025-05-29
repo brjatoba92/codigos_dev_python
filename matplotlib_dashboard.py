@@ -178,3 +178,31 @@ def exemplo_1_dashboard_performance():
     # formatacao de datas
     ax6.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
     ax6.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+
+    # 7 - Analise de eficiencia operacional
+    ax7 = plt.subplot(3,3,7)
+
+    # Calcular eficiencia como função de multiplas variaveis
+    eficiencia = (satisfacao_cliente * margem_lucro) / (tempo_entrega + 1)
+
+    # Scatter com tamanho proporcional às vendas
+    scatter = ax7.scatter(market_share, eficiencia, 
+                          s=vendas_totais/100,
+                          c=produtos_vendidos,
+                          alpha=0.7,cmap='plasma', edgecolors='black')
+    
+    # adicionar linha de tendencia
+    z = np.polyfit(market_share, eficiencia, 1)
+    p = np.polyid(z)
+    ax7.plot(market_share, p(market_share), 'r--', alpha=0.8, linewidth=2)
+
+    ax7.set_xlabel('Market Share (%)')
+    ax7.set_ylabel('Indice Eficiencia')
+    ax7.set_title('Eficiencia vs Market Share\n(Tamanho = Vendas)', fontweight='bold')
+
+    # Anotar lojas top
+    top3_eff = np.argsort(eficiencia)[-3:]
+    for idx in top3_eff:
+        ax7.annotate(f'Loja{idx+1}', (market_share[idx], eficiencia[idx]),xytext=(5,5), textcoords='offset points', fontweight='bold', color='red')
+        plt.colorbar(scatter7, ax=ax7, label='N° Produtos')
+
