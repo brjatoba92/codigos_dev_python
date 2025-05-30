@@ -621,7 +621,7 @@ def salvar_dashboard_completo(fig, dados_dict, nome_projeto="projeto_dashboard",
     # 4 - Salvar HTML
     print("\n🌐 Salvando dashboard como HTML...")
     try:
-        caminho_html = gerar_relatorio_html(nome_completo. resultados, dados_dict) 
+        caminho_html = gerar_relatorio_html(nome_completo, resultados, dados_dict) 
         resultados['caminhos']['relatorio_html'] = caminho_html
     except Exception as e:
         print(f"✗ Erro ao salvar HTML: {e}")
@@ -656,7 +656,7 @@ def salvar_dashboard_completo(fig, dados_dict, nome_projeto="projeto_dashboard",
 
     return resultados
 
-def gerar_relatorio_html(nome_projeto, resultados):
+def gerar_relatorio_html(nome_projeto, resultados, dados_dict):
     """
     Gera um relatório HTML com o resumo do dashboard.
     """
@@ -782,4 +782,36 @@ def gerar_relatorio_html(nome_projeto, resultados):
     print(f"✓ Relatório HTML gerado: {caminho_html}")
     return caminho_html
 
-    
+def criar_resumo_salvamento(resultados):
+    """
+    Cria um arquivo de resumo com o resultado do salvamento.
+    """
+    os.makedirs("resumos_salvamento", exist_ok=True)
+    timestamp = resultados['timestamp']
+    caminho_resumo = f"resumos_salvamento/resumo_{timestamp}.txt"
+
+    with open(caminho_resumo, 'w', encoding='utf-8') as f:
+        f.write(f"Resumo do Salvamento - {resultados['nome_projeto']}\n")
+        f.write("=" * 50 + "\n\n")
+        f.write(f"Data/Hora: {datetime.now().strftime('%d/%m/%Y às %H:%M:%S')}\n")
+        f.write(f"Timestamp: {timestamp}\n\n")
+        f.write("Arquivos Salvos:\n")
+        f.write("=" * 20 + "\n")
+        
+        for categoria, arquivos in resultados['caminhos'].items():
+            f.write(f"\n{categoria.upper()}\n")
+            if isinstance(arquivos, dict):
+                for formato, caminho in arquivos.items():
+                    f.write(f" - {formato}: {caminho}\n")
+            else:
+                f.write(f"   - {arquivos}\n")
+    print(f"✓ Resumo salvo em: {caminho_resumo}")
+    return caminho_resumo
+
+salvar_dashboard_completo(
+    fig=dados['fig'],  # Passar a figura
+    dados_dict=dados_sem_fig,  # Passar os dados (sem a figura)
+    nome_projeto="dashboard_performance",  # Nome do projeto
+    config_personalizada=None,  # Opcional: passar None ou um dicionário de configurações
+    salvar_html=True  # Salvar relatório HTML
+)
