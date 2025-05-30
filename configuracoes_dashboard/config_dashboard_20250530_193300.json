@@ -1,0 +1,217 @@
+{
+  "figura": {
+    "tamanho": [
+      15.0,
+      10.0
+    ],
+    "dpi": 100.0,
+    "facecolor": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "tight_layout": true
+  },
+  "subplots": [
+    {
+      "indice": 0,
+      "titulo": "Vendas Totais por Empresa",
+      "xlabel": "",
+      "ylabel": "",
+      "xlim": [
+        -0.8900000000000001,
+        9.89
+      ],
+      "ylim": [
+        0.0,
+        3160.6275024633974
+      ],
+      "grid": true,
+      "posicao": [
+        0.03665740740740741,
+        0.5354166666666667,
+        0.45761574074074074,
+        0.4062499999999999
+      ]
+    },
+    {
+      "indice": 1,
+      "titulo": "Relação Vendas x Margem (Tamanho = Satisfação)",
+      "xlabel": "Vendas Totais",
+      "ylabel": "Margem de Lucro (%)",
+      "xlim": [
+        -87.67536450676135,
+        3157.635564032963
+      ],
+      "ylim": [
+        4.819638704650069,
+        18.326760289990766
+      ],
+      "grid": true,
+      "posicao": [
+        0.5323842592592593,
+        0.5354166666666667,
+        0.45761574074074074,
+        0.4062499999999999
+      ]
+    },
+    {
+      "indice": 2,
+      "titulo": "Distribuição de Satisfação do Cliente",
+      "xlabel": "Satisfação",
+      "ylabel": "",
+      "xlim": [
+        6.430731966029793,
+        9.610168616678303
+      ],
+      "ylim": [
+        0.0,
+        4.2
+      ],
+      "grid": true,
+      "posicao": [
+        0.03665740740740741,
+        0.05341666666666667,
+        0.45761574074074074,
+        0.40624999999999994
+      ]
+    },
+    {
+      "indice": 3,
+      "titulo": "Vendas Mensais",
+      "xlabel": "",
+      "ylabel": "",
+      "xlim": [
+        -0.25,
+        5.25
+      ],
+      "ylim": [
+        -78.32351175983133,
+        2828.638930432213
+      ],
+      "grid": true,
+      "posicao": [
+        0.5323842592592593,
+        0.05341666666666667,
+        0.45761574074074074,
+        0.40624999999999994
+      ]
+    }
+  ],
+  "dados": {
+    "empresas": {
+      "valores": [
+        "Empresa_1",
+        "Empresa_2",
+        "Empresa_3",
+        "Empresa_4",
+        "Empresa_5",
+        "Empresa_6",
+        "Empresa_7",
+        "Empresa_8",
+        "Empresa_9",
+        "Empresa_10"
+      ],
+      "tipo": "list",
+      "tamanho": 10
+    },
+    "vendas": {
+      "valores": [
+        469.2680899768591,
+        3010.121430917521,
+        1316.7456935454493,
+        912.9425537759532,
+        169.62487046234628,
+        169.5962919146052,
+        59.838768608680674,
+        2011.2308644799396,
+        919.0821536272646,
+        1231.2500617045903
+      ],
+      "tipo": "numpy.array",
+      "shape": [
+        10
+      ],
+      "dtype": "float64"
+    },
+    "margem_lucro": {
+      "valores": [
+        12.652628070325239,
+        17.712800217929825,
+        12.682911535937688,
+        12.671351232148716,
+        16.20981135783017,
+        5.43359877671101,
+        6.375410837434837,
+        12.188562353795136,
+        9.93584439832788,
+        16.571236662976368
+      ],
+      "tipo": "numpy.array",
+      "shape": [
+        10
+      ],
+      "dtype": "float64"
+    },
+    "satisfacao_cliente": {
+      "valores": [
+        7.091975924478789,
+        6.587696298664708,
+        9.465648768921554,
+        7.774223699513464,
+        8.067528204687925,
+        6.575251813786544,
+        7.455617275474817,
+        8.110922589709865,
+        6.849006422577697,
+        8.375698018345672
+      ],
+      "tipo": "numpy.array",
+      "shape": [
+        10
+      ],
+      "dtype": "float64"
+    },
+    "vendas_mensais": {
+      "valores": [
+        53.81114470344339,
+        2378.950234805545,
+        2696.504273968938,
+        1321.8652582503014,
+        290.63028797500664,
+        82.221852002005
+      ],
+      "tipo": "numpy.array",
+      "shape": [
+        6
+      ],
+      "dtype": "float64"
+    },
+    "meses": {
+      "valores": [
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai",
+        "Jun"
+      ],
+      "tipo": "list",
+      "tamanho": 6
+    }
+  },
+  "timestamp": "20250530_193300",
+  "versao_matplotlib": "3.10.3",
+  "config_personalizada": {
+    "autor": "Analista de Dados",
+    "departamento": "Materiais de Construção",
+    "versao_dashboard": "1.0",
+    "descricao": "Dashboard de performance das empresas de materiais de construção",
+    "parametros_analise": {
+      "periodo": "2024",
+      "regiao": "Sudeste",
+      "categoria": "Materiais Basicos"
+    }
+  }
+}
