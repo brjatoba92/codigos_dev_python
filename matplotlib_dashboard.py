@@ -655,4 +655,131 @@ def salvar_dashboard_completo(fig, dados_dict, nome_projeto="projeto_dashboard",
     print("=" * 60)
 
     return resultados
-        
+
+def gerar_relatorio_html(nome_projeto, resultados):
+    """
+    Gera um relatório HTML com o resumo do dashboard.
+    """
+
+    #verifica se os dados_dict é valido
+    if dados_dict is None:
+        dados_dict = {}
+    
+    os.makedirs("relatorios_html", exist_ok=True)
+
+    timestamp = resultados['timestamp']
+    caminho_html = f"relatorios_html/relatorio_{nome_projeto}.html"
+
+    # estatisticas basicas dos dados
+    stats_html = ""
+    if dados_dict:
+        for nome, dados in dados_dict.items():
+            if dados is None:
+                continue
+            try:
+                if isinstance(dados, (list, np.ndarray)) and len(dados)>0:
+                    dados_num = np.array(dados)
+                    # verificar se são dados numericos
+                    if dados_num.dtype in [np.float64, np.int64, np.float32, np.int32]:
+                        stats_html += f"""
+                        <div class="stat-card">
+                        <h3>{nome}</h3>
+                            <p><strong>Média:</strong> {np.mean(dados_num):.2f}</p>
+                            <p><strong>Desvio Padrão:</strong> {np.std(dados_num):.2f}</p>
+                            <p><strong>Mín/Máx:</strong> {np.min(dados_num):.2f} / {np.max(dados_num):.2f}</p>
+                            <p><strong>Total de Registros:</strong> {len(dados_num)}</p>
+                        </div>
+                    """
+                    else:
+                        # para dados não numericos
+                        stats_html += f"""
+                        <div class="stat-card">
+                            <h3>{nome}</h3>
+                            <p><strong>Tipo:</strong> {type(dados_num[0]).__name__ if len(dados_num) > 0 else 'Vazio'}</p>
+                            <p><strong>Total de Registros:</strong> {len(dados_num)}</p>
+                            <p><strong>Exemplo:</strong> {dados_num[0] if len(dados_num) > 0 else 'N/A'}</p>
+                        </div>
+                    """
+                elif isinstance(dados, (str, int, float)):
+                    # para valores unicos
+                    stats_html += f"""
+                    <div class="stat-card">
+                        <h3>{nome}</h3>
+                        <p><strong>Valor:</strong> {dados}</p>
+                        <p><strong>Tipo:</strong> {type(dados).__name__}</p>
+                    </div>
+                    """
+            except Exception as e:
+                # em caso de erro: mostrar informações basicas
+                stats_html += f"""
+                <div class="stat-card">
+                    <h3>{nome}</h3>
+                    <p><strong>Erro ao processar:</strong> {str(e)[:100]}</p>
+                    <p><strong>Tipo:</strong> {type(dados).__name__}</p>
+                </div>
+                """
+    else:
+        stats_html = "<p>Nenhum dado disponível.</p>"
+
+    # Criar template HTML
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Relatório Dashboard - {nome_projeto}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }}
+            .header {{ background-color: #2c3e50; color: white; padding: 20px; border-radius: 8px; }}
+            .content {{ background-color: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+            .stat-card {{ display: inline-block; margin: 10px; padding: 15px; background-color: #ecf0f1; border-radius: 5px; min-width: 200px; }}
+            .file-list {{ list-style-type: none; padding: 0; }}
+            .file-list li {{ padding: 5px 0; border-bottom: 1px solid #eee; }}
+            .timestamp {{ color: #7f8c8d; font-size: 0.9em; }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>📊 Relatório do Dashboard </h1>
+            <h2>{nome_projeto}</h2>
+            <p class="timestamp">Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        </div>
+        <div class="content">
+             <h2>📈 Estatísticas dos Dados</h2>
+            {stats_html}
+        </div>
+        <div class="content">
+            <h2>📂 Arquivos Salvos</h2>
+            {stats_html}
+        </div>
+        <div class="content">
+            <h2>📁 Arquivos Salvos</h2>
+            <h3>🖼️ Imagens</h3>
+            <ul class="file-list">
+    """
+    for categoria, arquivos in resultados['caminhos'].items():
+        if isinstance(arquivos, dict):
+            for formato, caminho in arquivos.items():
+                html_content += f'<li>{formato.upper()}: <a href="{caminho}" target="_blank">{caminho}</a></li>'
+        else:
+            html_content += f"<li><strong>{categoria}:</strong> {arquivos}</li>"
+    html_content += """
+            </ul>
+        </div>
+        <div class="content">
+            <h2>ℹ️ Informações Técnicas</h2>
+            <p><strong>Timestamp:</strong> """ + timestamp + """</p>
+            <p><strong>Versão Matplotlib:</strong> """ + plt.matplotlib.__version__ + """</p>
+            <p><strong>Total de Variáveis:</strong> """ + str(len(dados_dict)) + """</p>
+        </div>
+    </body>
+    </html>
+    """
+
+    with open(caminho_html, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"✓ Relatório HTML gerado: {caminho_html}")
+    return caminho_html
+
+    
