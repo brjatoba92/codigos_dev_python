@@ -562,5 +562,58 @@ salvar_configuracao_dashboard(
     dados_dict=dados_sem_fig,  # Passar os dados (sem a figura)
     config_personalizada=None  # Opcional: passar None ou um dicionário de configurações
 )
-                
-    
+
+# ==============================================================================
+# METODO - FUNÇÃO COMPLETA DE SALVAMENTO
+# ==============================================================================
+
+def salvar_dashboard_completo(fig, dados_dict, nome_projeto="projeto_dashboard", config_personalizada=None, salvar_html=True):
+    """
+    Função completa para salvar o dashboard em múltiplos formatos e configurações.
+    """
+    print(f"\n🔄 Iniciando salvamento completo do dashboard: {nome_projeto}")
+    print("=" * 60)
+
+    # verificações de entrada
+    if fig is None:
+        print("⚠️ Aviso: Figura do dashboard não fornecida. Abortando salvamento.")
+        return None
+    if dados_dict is None:
+        print("⚠️ Aviso: Dados do dashboard não fornecidos. Abortando salvamento.")
+        dados_dict = {
+            'dados_exemplo': [1,2,3],
+            'timestamp': datetime.now().strftime("%Y%m%d_%H%M%S")
+        }
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    nome_completo = f"{nome_projeto}_{timestamp}"
+
+    resultados = {
+        'timestamp': timestamp,
+        'nome_projeto': nome_projeto,
+        'caminhos': {},
+    }
+
+    # 1 - Salvar imagens
+    print("\n🔍 Salvando imagens do dashboard...")
+    try:
+        caminhos_imagens = salvar_dashboard_imagens(fig, nome_completo)
+        resultados['caminhos']['imagens'] = caminhos_imagens
+    except Exception as e:
+        print(f"✗ Erro ao salvar imagens: {e}")
+        resultados['caminhos']['imagens'] = {}
+    # 2 - Salvar dados
+    print("\n📊 Salvando dados do dashboard...")
+    try:
+        caminhos_dados = salvar_dados_dashboard(dados_dict, nome_completo)
+        resultados['caminhos']['dados'] = caminhos_dados
+    except Exception as e:
+        print(f"✗ Erro ao salvar dados: {e}")
+        resultados['caminhos']['dados'] = {}
+    # 3 - Salvar configuração
+    print("\n⚙️ Salvando configuração do dashboard...")
+    try:
+        caminho_config = salvar_configuracao_dashboard(fig, dados_dict, config_personalizada)
+        resultados['caminhos']['configuracao'] = caminho_config
+    except Exception as e:
+        print(f"✗ Erro ao salvar configuração: {e}")
+        resultados['caminhos']['configuracao'] = None
