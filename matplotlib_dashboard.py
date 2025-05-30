@@ -564,7 +564,7 @@ salvar_configuracao_dashboard(
 )
 
 # ==============================================================================
-# METODO - FUNÇÃO COMPLETA DE SALVAMENTO
+# METODO 4- FUNÇÃO COMPLETA DE SALVAMENTO
 # ==============================================================================
 
 def salvar_dashboard_completo(fig, dados_dict, nome_projeto="projeto_dashboard", config_personalizada=None, salvar_html=True):
@@ -617,3 +617,42 @@ def salvar_dashboard_completo(fig, dados_dict, nome_projeto="projeto_dashboard",
     except Exception as e:
         print(f"✗ Erro ao salvar configuração: {e}")
         resultados['caminhos']['configuracao'] = None
+    
+    # 4 - Salvar HTML
+    print("\n🌐 Salvando dashboard como HTML...")
+    try:
+        caminho_html = gerar_relatorio_html(nome_completo. resultados, dados_dict) 
+        resultados['caminhos']['relatorio_html'] = caminho_html
+    except Exception as e:
+        print(f"✗ Erro ao salvar HTML: {e}")
+        resultados['caminhos']['relatorio_html'] = None
+
+    # 5 - Criar arquivo de resumo
+    print("\n 📝 Criando arquivo de resumo...")
+    try:
+        caminho_resumo = criar_resumo_salvamento(resultados)
+        resultados['caminhos']['resumo'] = caminho_resumo
+    except Exception as e:
+        print(f"✗ Erro ao criar resumo: {e}")
+        resultados['caminhos']['resumo'] = None
+    print("\n" + "=" * 60)
+    print("\n✅ Salvamento completo concluído!")
+    print(f"Arquivos salvos no timestamp {timestamp}:")
+
+    # mostrar resumo de sucesso
+    sucessos = 0
+    total = 0
+
+    for categoria , conteudo in resultados['caminhos'].items():
+        if isinstance(conteudo, dict):
+            total += len(conteudo)
+            sucessos += len([v for v in conteudo.values() if v])
+        else:
+            total += 1
+            if conteudo:
+                sucessos += 1
+    print(f"📊 Sucesso: {sucessos}/{total} arquivos salvos")
+    print("=" * 60)
+
+    return resultados
+        
