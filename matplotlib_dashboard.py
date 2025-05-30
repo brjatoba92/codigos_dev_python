@@ -473,7 +473,94 @@ print("Conteúdo de dados_dict:", dados)
 # Salvar os dados
 salvar_dados_dashboard(dados)
 
+# ==============================================================================
+#  METODO 3 - SALVANDO CONFIGURAÇÃO DI DASHBOARD PARA REPRODUÇÃO
+# ==============================================================================
 
-               
+def salvar_configuracao_dashboard(fig, dados_dict, config_personalizada=None):
+    """
+    Salva a configuração do dashboard para reprodução.
+    """
+    os.makedirs("configuracoes_dashboard", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Extrair configurações da figura
+    config_dashboard = {
+        'figura': {
+            'tamanho': fig.get_size_inches().tolist(),
+            'dpi': fig.dpi,
+            'facecolor': fig.get_facecolor(),
+            'tight_layout': True
+        },
+        'subplots': [],
+        'dados': {},
+        'timestamp': timestamp,
+        'versao_matplotlib': plt.matplotlib.__version__
+    }
+
+    # configuracoes dos subplots
+    for i, ax in enumerate(fig.get_axes()):
+        subplot_config = {
+            'indice': i,
+            'titulo': ax.get_title(),
+            'xlabel': ax.get_xlabel(),
+            'ylabel': ax.get_ylabel(),
+            'xlim': ax.get_xlim(),
+            'ylim': ax.get_ylim(),
+            'grid': ax.get_axisbelow() is not None,
+            'posicao': ax.get_position().bounds
+        }
+        config_dashboard['subplots'].append(subplot_config)
+    
+    # Adicionar dados convertidos
+    for nome, dados in dados_dict.items():
+        if isinstance(dados, np.ndarray):
+            config_dashboard['dados'][nome] = {
+                'valores': dados.tolist(),
+                'tipo': 'numpy.array',
+                'shape': dados.shape,
+                'dtype': str(dados.dtype)
+            }
+        elif isinstance(dados, list):
+            config_dashboard['dados'][nome] = {
+                'valores': dados,
+                'tipo': 'list',
+                'tamanho': len(dados)
+            }
+        else:
+            config_dashboard['dados'][nome] = {
+                'valores': str(dados),
+                'tipo': type(dados).__name__
+            }
+    
+    # adicionar configurações personalizadas
+    if config_personalizada:
+        config_dashboard['config_personalizada'] = config_personalizada
+    
+    # Salvar configurações em JSON
+    caminho_config = f"configuracoes_dashboard/config_dashboard_{timestamp}.json"
+    with open(caminho_config, 'w', encoding='utf-8') as f:
+        json.dump(config_dashboard, f, indent=2, ensure_ascii=False)
+    print(f"✓ Configuração do dashboard salva: {caminho_config}")
+    return caminho_config
+
+# Executar o dashboard
+dados = dashboard_performance()
+
+#Opcional: remover 'fig' do dicionário de dados para evitar problemas de serialização
+dados_sem_fig = {k: v for k, v in dados.items() if k != 'fig'}
+
+# Salvar a figura em diferentes formatos
+salvar_dashboard_imagens(dados['fig'])
+
+# Salvar os dados em diferentes formatos
+salvar_dados_dashboard(dados_sem_fig)
+
+# Salvar a configuração do dashboard
+salvar_configuracao_dashboard(
+    fig=dados['fig'],  # Passar a figura
+    dados_dict=dados_sem_fig,  # Passar os dados (sem a figura)
+    config_personalizada=None  # Opcional: passar None ou um dicionário de configurações
+)
                 
     
