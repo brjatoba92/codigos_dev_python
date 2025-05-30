@@ -815,3 +815,83 @@ salvar_dashboard_completo(
     config_personalizada=None,  # Opcional: passar None ou um dicionário de configurações
     salvar_html=True  # Salvar relatório HTML
 )
+
+# =============================================================================
+# METODO 5 - EXEMPLO DE USO PRATICO
+# =============================================================================
+def exemplo_uso_pratico():
+    """
+    Exemplo prático de como usar os métodos de salvamento
+    """
+
+    # Criar um dashboard simples para demonstração
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(15, 10))
+    fig.suptitle('Dashboard de Exemplo - Materiais de Construção', fontsize=5, fontweight='bold')
+
+    # dados de exemplo
+    np.random.seed(42)
+    empresas = [f'Empresa_{i+1}' for i in range(10)]
+    vendas = np.random.exponential(1000, 10)
+    margem = np.random.normal(15, 5, 10)
+    satisfacao = np.random.normal(8, 1, 10)
+
+    # graficos
+    ax1.bar(range(len(empresas)), vendas, color='skyblue')
+    ax1.set_title('Vendas Totais por Empresa')
+    ax1.set_xticks(range(len(empresas)))
+    ax1.set_xticklabels([f'E{i+1}' for i in range(10)], rotation=45)
+
+    ax2.scatter(vendas, margem, s=satisfacao, alpha=0.7, c=satisfacao, cmap='viridis' )
+    ax2.set_title('Relação Vendas x Margem (Tamanho = Satisfação)')
+    ax2.set_xlabel('Vendas Totais')
+    ax2.set_ylabel('Margem de Lucro (%)')
+
+    ax3.hist(satisfacao, bins=5, alpha=0.7, color='orange')
+    ax3.set_title('Distribuição de Satisfação do Cliente')
+    ax3.set_xlabel('Satisfação')
+
+    meses = [ 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun']
+    vendas_mensais = np.random.exponential(800,6)
+    ax4.plot(meses, vendas_mensais, 'o-', linewidth=2, markersize=8)
+    ax4.set_title('Vendas Mensais')
+    ax4.tick_params(axis='x', rotation=45)
+    
+    plt.tight_layout()
+
+    # preparar dados para salvamento
+    dados_dashboard = {
+        'empresas': empresas,
+        'vendas': vendas,
+        'margem_lucro': margem,
+        'satisfacao_cliente': satisfacao,
+        'vendas_mensais': vendas_mensais,
+        'meses': meses
+    }
+
+    # configurações érsonalizadasd
+    config_personalizada = {
+        'autor': 'Analista de Dados',
+        'departamento': 'Materiais de Construção',
+        'versao_dashboard': '1.0',
+        'descricao': 'Dashboard de performance das empresas de materiais de construção',
+        'parametros_analise': {
+            'periodo': '2024',
+            'regiao': 'Sudeste',
+            'categoria': 'Materiais Basicos'
+        }
+    }
+
+    # Executar salvamento completo
+    resultados = salvar_dashboard_completo(
+        fig=fig,  # Passar a figura
+        dados_dict=dados_dashboard,  # Passar os dados do dashboard
+        nome_projeto="analise_performance_empresas",  # Nome do projeto
+        config_personalizada=config_personalizada,  # Passar configurações personalizadas
+        salvar_html=True  # Salvar relatório HTML
+    )
+
+    #mostrar o dashboard
+    plt.show()
+    return resultados, fig, dados_dashboard
+
+exemplo_uso_pratico()

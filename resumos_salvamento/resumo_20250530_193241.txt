@@ -1,0 +1,27 @@
+Resumo do Salvamento - dashboard_performance
+==================================================
+
+Data/Hora: 30/05/2025 às 19:32:55
+Timestamp: 20250530_193241
+
+Arquivos Salvos:
+====================
+
+IMAGENS
+ - png: dashboards_salvos/dashboard_performance_20250530_193241_20250530_193241.png
+ - pdf: dashboards_salvos/dashboard_performance_20250530_193241_20250530_193241.pdf
+ - svg: dashboards_salvos/dashboard_performance_20250530_193241_20250530_193241.svg
+ - jpg: dashboards_salvos/dashboard_performance_20250530_193241_20250530_193241.jpg
+ - eps: dashboards_salvos/dashboard_performance_20250530_193241_20250530_193241.eps
+
+DADOS
+ - excel: dados_salvos/dashboard_performance_20250530_193241_20250530_193255.xlsx
+ - csv: dados_salvos/dashboard_performance_20250530_193241_20250530_193255.csv
+ - json: dados_salvos/dashboard_performance_20250530_193241_20250530_193255.json
+ - pickle: dados_salvos/dashboard_performance_20250530_193241_20250530_193255.pkl
+
+CONFIGURACAO
+   - configuracoes_dashboard/config_dashboard_20250530_193255.json
+
+RELATORIO_HTML
+   - relatorios_html/relatorio_dashboard_performance_20250530_193241.html

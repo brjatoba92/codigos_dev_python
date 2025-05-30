@@ -1,0 +1,27 @@
+Resumo do Salvamento - analise_performance_empresas
+==================================================
+
+Data/Hora: 30/05/2025 às 19:33:00
+Timestamp: 20250530_193256
+
+Arquivos Salvos:
+====================
+
+IMAGENS
+ - png: dashboards_salvos/analise_performance_empresas_20250530_193256_20250530_193256.png
+ - pdf: dashboards_salvos/analise_performance_empresas_20250530_193256_20250530_193256.pdf
+ - svg: dashboards_salvos/analise_performance_empresas_20250530_193256_20250530_193256.svg
+ - jpg: dashboards_salvos/analise_performance_empresas_20250530_193256_20250530_193256.jpg
+ - eps: dashboards_salvos/analise_performance_empresas_20250530_193256_20250530_193256.eps
+
+DADOS
+ - excel: dados_salvos/analise_performance_empresas_20250530_193256_20250530_193300.xlsx
+ - csv: dados_salvos/analise_performance_empresas_20250530_193256_20250530_193300.csv
+ - json: dados_salvos/analise_performance_empresas_20250530_193256_20250530_193300.json
+ - pickle: dados_salvos/analise_performance_empresas_20250530_193256_20250530_193300.pkl
+
+CONFIGURACAO
+   - configuracoes_dashboard/config_dashboard_20250530_193300.json
+
+RELATORIO_HTML
+   - relatorios_html/relatorio_analise_performance_empresas_20250530_193256.html
