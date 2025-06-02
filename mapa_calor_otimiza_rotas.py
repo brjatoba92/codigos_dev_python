@@ -292,8 +292,108 @@ def otimizar_rotas():
     return fig
 
 # Gerando o gráfico de otimização de rotas
-fig_otimizacao_rotas = otimizar_rotas()
+#fig_otimizacao_rotas = otimizar_rotas()
 # Exibindo o gráfico de otimização de rotas
-plt.show()
+#plt.show()
 # Salvando o gráfico de otimização de rotas
-fig_otimizacao_rotas.savefig('otimizacao_rotas_entrega.png', dpi=300, bbox_inches='tight')
+#fig_otimizacao_rotas.savefig('otimizacao_rotas_entrega.png', dpi=300, bbox_inches='tight')
+
+# Analise de clusters geograficas
+def analise_clusters_geograficos():
+    """Analise de clusters de vendas por proximidade geografica"""
+    fig, axes = plt.subplots(2, 2, figsize=(18, 14))
+    fig.suptitle('Análise de Clusters Geográficos de Vendas', fontsize=20, fontweight='bold')
+
+    # 1 - K-Means Clustering SIMPLES
+    from sklearn.cluster import KMeans
+
+    ax1 = axes[0, 0]
+
+    # preparando dados para o clustering
+    vendas_cidade = df_vendas.groupby(['cidade', 'latitude', 'longitude'])['vendas'].sum().reset_index()
+    coordes_vendas = vendas_cidade[['latitude', 'longitude']].values
+
+    # normalizando coordenadas
+    coords_norm = coordes_vendas[:, :2]
+    coords_norm = (coords_norm - coords_norm.mean(axis=0)) / coords_norm.std(axis=0)
+
+    # Clustering
+    kmeans = KMeans(n_clusters=4, random_state=42)
+    clusters = kmeans.fit_predict(coords_norm)
+
+    colors = ['red', 'blue', 'green', 'orange']
+    for i in range(4):
+        mask = clusters == i
+        ax1.scatter(vendas_cidade.loc[mask, 'longitude'], 
+                    vendas_cidade.loc[mask, 'latitude'], 
+                    c=colors[i], label=f'Cluster {i+1}', 
+                    s=vendas_cidade.loc[mask, 'vendas']/500, alpha=0.7
+                )
+    ax1.set_title('K-Means Clustering de Vendas', fontsize=14, fontweight='bold')
+    ax1.set_xlabel('Longitude')
+    ax1.set_ylabel('Latitude')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # 2 - Analise de densidade
+    ax2 = axes[0, 1]
+
+    # Hexbin plot para densidade
+    hb = ax2.hexbin(df_vendas['longitude'], df_vendas['latitude'],
+                    C=df_vendas['vendas'], gridsize=15, cmap='YlOrRd', alpha=0.7)
+    
+    ax2.set_title('Densidade Hexagonal de Vendas', fontsize=14, fontweight='bold')
+    ax2.set_xlabel('Longitude')
+    ax2.set_ylabel('Latitude')
+
+    cb2 = plt.colorbar(hb, ax=ax2)
+    cb2.set_label('Vendas Medias')
+
+    # 3 -Analise Temporal por cluster
+    ax3 = axes[1, 0]
+
+    vendas_cidade['cluster'] = clusters
+    df_vendas_cluster = df_vendas.merge(vendas_cidade[['cidade', 'cluster']], on='cidade')
+    vendas_temporais = df_vendas_cluster.groupby(['cluster', 'mes'])['vendas'].mean().reset_index()
+
+    for i in range(4):
+        data = vendas_temporais[vendas_temporais['cluster'] == i]
+        ax3.plot(data['mes'], data['vendas'], marker='o', label=f'Cluster {i+1}', 
+                 color=colors[i], linewidth=2, markersize=6)
+    ax3.set_title('Evolução Temporal por cluster', fontsize=14, fontweight='bold')
+    ax3.set_xlabel('Mes')
+    ax3.set_ylabel('Vendas Médias (R$)')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+    ax3.set_xticks(range(1, 13))
+
+    # 4 - Matriz de correlação entre clusters
+    ax4 = axes[1, 1]
+
+    # Criando matriz de vendas por cluster e mês
+    pivot_clusters = vendas_temporais.pivot(index='mes', columns='cluster', values='vendas')
+    corr_matrix = pivot_clusters.corr()
+
+    im = ax4.imshow(corr_matrix, cmap='coolwarm', aspect='auto', vmin=-1, vmax=1)
+
+    # Adicionando valores na matriz
+    for i in range(len(corr_matrix)):
+        for j in range(len(corr_matrix.columns)):
+            text = ax4.text(j, i, f'{corr_matrix.iloc[i, j]:.2f}', 
+                            ha='center', va='center', color='black', fontweight='bold')
+
+    ax4.set_title('Correlação entre Clusters', fontsize=14, fontweight='bold')
+    ax4.set_xticks(range(4))
+    ax4.set_yticks(range(4))
+    ax4.set_xticklabels([f'Cluster {i+1}' for i in range(4)])
+    ax4.set_yticklabels([f'Cluster {i+1}' for i in range(4)])
+
+    plt.colorbar(im, ax=ax4, label='Correlação')
+    plt.tight_layout(pad=3)
+    return fig
+# Gerando o gráfico de análise de clusters geográficos
+fig_analise_clusters = analise_clusters_geograficos()
+# Exibindo o gráfico de análise de clusters geográficos
+plt.show()
+# Salvando o gráfico de análise de clusters geográficos
+fig_analise_clusters.savefig('analise_clusters_geograficos.png', dpi=300, bbox_inches='tight')
