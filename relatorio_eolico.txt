@@ -1,0 +1,33 @@
+
+        RELATÓRIO TÉCNICO - ANÁLISE EÓLICA
+        Estação: Estacao_A
+        Período: 2023-01-01 a 2023-02-11
+        =============================================
+        
+        1. ESTATÍSTICAS BÁSICAS:
+        - Velocidade média: 6.93 m/s
+        - Velocidade máxima: 22.23 m/s
+        - Direção predominante: 359.6°
+        - Frequência de calmaria: 0.3%
+        - Intensidade de turbulência: 0.525
+        
+        2. DISTRIBUIÇÃO DE WEIBULL:
+        
+   - setor_0: k=1.76, c=7.58 m/s, freq=18.0%
+   - setor_1: k=2.11, c=7.75 m/s, freq=14.7%
+   - setor_2: k=2.06, c=7.84 m/s, freq=8.4%
+   - setor_3: k=2.15, c=7.32 m/s, freq=4.3%
+   - setor_4: k=2.19, c=9.10 m/s, freq=2.1%
+   - setor_11: k=2.39, c=8.03 m/s, freq=2.0%
+   - setor_12: k=2.14, c=8.01 m/s, freq=4.9%
+   - setor_13: k=1.88, c=7.91 m/s, freq=8.6%
+   - setor_14: k=1.96, c=7.34 m/s, freq=14.2%
+   - setor_15: k=2.07, c=8.08 m/s, freq=19.8%
+        
+        3. POTENCIAL EÓLICO:
+        - Potencial teórico: 702.62 W/m²
+        - Classificação de vento: Excepcional (Classe 7)
+        
+        4. RECOMENDAÇÕES:
+        
+- Local com excelente potencial eólico, recomendado para instalação de turbinas.
